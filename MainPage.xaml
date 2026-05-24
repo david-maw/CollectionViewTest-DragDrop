@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:CollectionViewTest"
+             BindingContext="{local:MainViewModel}"
+             x:Name="Page"
+             x:DataType="local:MainViewModel"
+             x:Class="CollectionViewTest.MainPage">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear Log" Command="{Binding ClearLogCommand}"/>
+    </ContentPage.ToolbarItems>
+    <Grid
+            ColumnDefinitions="*"
+            RowDefinitions="auto, auto, *, auto, *, auto"
+            Padding="30,0"
+            RowSpacing="25">
+        <Grid.GestureRecognizers>
+            <SwipeGestureRecognizer 
+                CommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=Direction, StringFormat='On Grid, direction = {0}', x:DataType=SwipeGestureRecognizer}"
+                Direction="Left"
+                Command="{Binding ShowSwipeCommand}"/>
+            <SwipeGestureRecognizer 
+                CommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=Direction, StringFormat='On Grid, direction = {0}', x:DataType=SwipeGestureRecognizer}"
+                Direction="Right"
+                Command="{Binding ShowSwipeCommand}"/>
+            <SwipeGestureRecognizer 
+                CommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=Direction, StringFormat='On Grid, direction = {0}', x:DataType=SwipeGestureRecognizer}"
+                Direction="Up"
+                Command="{Binding ShowSwipeCommand}"/>
+            <SwipeGestureRecognizer 
+                CommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=Direction, StringFormat='On Grid, direction = {0}', x:DataType=SwipeGestureRecognizer}"
+                Direction="Down"
+                Command="{Binding ShowSwipeCommand}"/>
+            <TapGestureRecognizer 
+                CommandParameter="On Page Root (Grid)"
+                Command="{Binding ShowTapCommand}"/>
+        </Grid.GestureRecognizers>
+        <HorizontalStackLayout Grid.Row="1">
+            <Label Text="Long List" VerticalOptions="Center"/>
+            <CheckBox IsChecked="{Binding IsLongList}"/>
+        </HorizontalStackLayout>
+        <Border Grid.Row="2" Padding="2">
+            <CollectionView x:Name="personCollectionView"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding People}"
+                            SelectedItem="{Binding SelectedPerson, Mode=TwoWay}" 
+                            Scrolled="OnCollectionViewScrolled"
+                            SelectionChangedCommand="{Binding SelectionChangedCommand}"
+                            Margin="0,0,0,0" BackgroundColor="Transparent">
+                <CollectionView.GestureRecognizers>
+                    <!--<TapGestureRecognizer 
+                CommandParameter="On Collection"
+                Command="{Binding ShowTapCommand}"/>-->
+                </CollectionView.GestureRecognizers>
+                <CollectionView.Header>
+                    <Rectangle HeightRequest="2" BackgroundColor="Black"/>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:Person">
+                        <VerticalStackLayout>
+                            <VerticalStackLayout.Behaviors>
+                                <!--TouchBehavior cannot use relative bindings-->
+                                <!--<toolkit:TouchBehavior
+                                    Command="{Binding Source={x:Reference Page}, Path=BindingContext.ShowTouchCommand}"
+                                    CommandParameter="{Binding}"
+                                    LongPressDuration="750"
+                                    LongPressCommand="{Binding Source={x:Reference Page}, Path=BindingContext.ShowLongPressCommand}"
+                                    LongPressCommandParameter="{Binding}"/>-->
+                            </VerticalStackLayout.Behaviors>
+                            <VerticalStackLayout.GestureRecognizers>
+                                <!--<TapGestureRecognizer 
+                                            CommandParameter="{Binding Name,StringFormat='On item: {0}'}"
+                                            Command="{Binding ShowTapCommand, Source={RelativeSource AncestorType={x:Type local:MainViewModel}},x:DataType=local:MainViewModel}"/>-->
+                            </VerticalStackLayout.GestureRecognizers>
+                            <Grid ColumnDefinitions="auto,*,auto">
+                                <!--#region Actual Person Layout -->
+                                <Grid Grid.Column="1" ColumnDefinitions="auto,auto,auto,auto" ColumnSpacing="5" VerticalOptions="Center" Margin="10,0,0,0">
+                                    <Label Grid.Column="0" Text="{Binding FirstName}" FontSize="Small">
+                                        <Label.GestureRecognizers>
+                                            <DragGestureRecognizer
+                                                DragStartingCommand="{Binding DragStartingCommand, Source={RelativeSource AncestorType={x:Type local:MainViewModel}}, x:DataType=local:MainViewModel}"
+                                                DragStartingCommandParameter="{Binding}"/>
+                                            <DropGestureRecognizer
+                                                DropCommand="{Binding DropCommand, Source={RelativeSource AncestorType={x:Type local:MainViewModel}}, x:DataType=local:MainViewModel}"
+                                                DropCommandParameter="{Binding}"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Grid.Column="1" Text="{Binding LastName}" FontSize="Small"/>
+                                    <Label Grid.Column="2" Text="{Binding Name,StringFormat='is: {0}'}" FontSize="Small"/>
+                                </Grid>
+                                <!--#endregion-->
+                            </Grid>
+                            <Rectangle HeightRequest="2" BackgroundColor="Black"/>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+        <VerticalStackLayout Grid.Row="3" Spacing="5">
+            <Label Text="{Binding SelectedItem, Source={x:Reference personCollectionView}, StringFormat='CollectionView.SelectedItem = {0}',TargetNullValue='CollectionView SelectedItem is null', x:DataType=CollectionView}"/>
+            <Label Text="{Binding SelectedPerson, StringFormat='SelectedPerson Property = {0}',TargetNullValue='SelectedPerson Property is null' }"/>
+            <Button Text="Select First Item" Command="{Binding SelectFirstCommand}"/>
+            <Button Text="Select Last Item" Command="{Binding SelectLastCommand}"/>
+        </VerticalStackLayout>
+        <Border Grid.Row="4" Padding="2">
+            <Label Text="{Binding CommandLog, TargetNullValue='No events logged' }" FontSize="Micro"/>
+        </Border>
+        <Button Grid.Row="4" Text="Clear" Command="{Binding ClearLogCommand}" HorizontalOptions="End" VerticalOptions="End"/>
+    </Grid>
+
+</ContentPage>
